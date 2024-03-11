@@ -13,6 +13,8 @@ jobs:
 
       - name: Pana analyzer
         uses: axel-op/dart-package-analyzer@v3
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
         id: pana-analysis
 
   check-scores:
