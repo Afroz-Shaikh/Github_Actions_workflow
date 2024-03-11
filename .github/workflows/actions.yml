@@ -14,29 +14,42 @@ jobs:
     if: github.ref != 'refs/heads/stable'
     runs-on: ubuntu-latest
     steps:
-      # Setup Java environment in order to build the Android app.
       - uses: actions/checkout@v1
+            
       - uses: actions/setup-java@v1
         with:
           java-version: "12.x"
 
-      # Setup the flutter environment.
       - uses: subosito/flutter-action@v1
         with:
-          channel: "stable" # 'dev', 'alpha', default to: 'stable'
-          # flutter-version: '1.12.x' # you can also specify exact version of flutter
+          channel: "stable"
 
-      # Get flutter dependencies.
       - run: flutter pub get
 
-      # Check for any formatting issues in the code.
       - run: dart format --set-exit-if-changed .
 
-      # Statically analyze the Dart code for any errors.
       - run: flutter analyze .
 
-      # Run widget tests for our flutter project.
       - run: flutter test
 
-      # Pub dry run.
+      # Install pana
+      - name: Install pana
+        run: pub global activate pana
+
+      # Run pana to generate the package score report
+      - name: Run pana
+        run: pub global run pana
+
+      # Extract score from pana report
+      - name: Extract pana score
+        id: extract-pana-score
+        run: |
+          score=$(grep -oP "(?<=score: )\d+\.\d+" pana_report.txt)
+          echo "::set-output name=pana-score::$score"
+
+      # Use the extracted score as an output
+      - name: Use pana score
+        run: echo "Pana Score: ${{ steps.extract-pana-score.outputs.pana-score }}"
+
+      # Pub dry run
       - run: flutter pub publish --dry-run
