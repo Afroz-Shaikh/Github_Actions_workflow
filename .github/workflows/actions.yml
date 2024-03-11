@@ -19,11 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: analyze-package
     steps:
-      - name: Debug
-        run: |
-          echo "TOTAL: ${{ needs.analyze-package.outputs.total }}"
-          echo "TOTAL_MAX: ${{ needs.analyze-package.outputs.total_max }}"
-      - name: Check scores
+      - name: Checking pana scores
         env:
           TOTAL: ${{ needs.analyze-package.outputs.total }}
           TOTAL_MAX: ${{ needs.analyze-package.outputs.total_max }}
@@ -33,6 +29,8 @@ jobs:
             echo "Score too low!"
             exit 1
           fi
+
+          echo "Score is satisfactory. Proceeding to build."
 
   build-and-publish:
     runs-on: ubuntu-latest
