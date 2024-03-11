@@ -1,4 +1,4 @@
-name: Package Publish Run
+name: Trigger PubDev Release
 
 on:
   workflow_dispatch:
@@ -25,7 +25,7 @@ jobs:
           TOTAL: ${{ steps.pana-analysis.outputs.total }}
           TOTAL_MAX: ${{ steps.pana-analysis.outputs.total_max }}
         run: |
-          PERCENTAGE=$(( $TOTAL * 100 / $TOTAL_MAX ))
+          PERCENTAGE=$(( $TOTAL ))
           if (( $PERCENTAGE < 110 )); then
             echo "Score too low!"
             exit 1
