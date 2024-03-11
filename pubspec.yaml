@@ -1,7 +1,7 @@
 name: actions_demo
 description: "A new Flutter package project."
 version: 0.0.1
-# homepage: https://github.com/GeekyAnts/GluestackUI
+homepage: https://github.com/GeekyAnts/GluestackUI
 
 environment:
   sdk: ">=3.2.4 <4.0.0"
