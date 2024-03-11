@@ -38,10 +38,6 @@ jobs:
       # Run widget tests for our flutter project.
       - run: flutter test
 
-      # Pub dry run.
-      - run: flutter doctor -v
-      - run: flutter pub publish --dry-run
-
       # Integrate Dart/Flutter Package Analyzer
       - uses: axel-op/dart-package-analyzer@v3
         # set an id for the current step
@@ -61,3 +57,7 @@ jobs:
             echo Score too low!
             exit 1
           fi
+
+      # Pub dry run.
+      - run: flutter doctor -v
+      - run: flutter pub publish --dry-run
