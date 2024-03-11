@@ -1,8 +1,7 @@
-name: Package Flutter Run
+name: Package Publish Run
+
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   analyze-package:
