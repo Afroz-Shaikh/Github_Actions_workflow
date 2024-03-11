@@ -20,8 +20,7 @@ jobs:
 
       - name: Create release tag
         id: create_tag
-        run: echo ::set-output name=RELEASE_TAG::$(echo "${GITHUB_REF/refs\/tags\//}" | sed -e 's/^v//' | awk -F'[.]' '{print "v" $1 "." $2+1 ".0"}')
-        continue-on-error: true
+        run: echo ::set-output name=RELEASE_TAG::$(echo "${TAG}" | awk -F'[.]' '{print "v" $1 "." $2+1 ".0"}')
 
       - name: Create GitHub Release
         uses: actions/create-release@v1
