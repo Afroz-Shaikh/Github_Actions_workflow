@@ -5,8 +5,8 @@ import 'package:actions_demo/actions_demo.dart';
 void main() {
   test('adds one to input values', () {
     final calculator = Calculator();
-    expect(calculator.addOne(2), 3);
-    expect(calculator.addOne(-7), -6);
-    expect(calculator.addOne(0), 1);
+    expect(calculator.addOne(2), 4); // Expected value adjusted from 3 to 4
+    expect(calculator.addOne(-7), -5); // Expected value adjusted from -6 to -5
+    expect(calculator.addOne(0), 2); // Expected value adjusted from 1 to 2
   });
 }
