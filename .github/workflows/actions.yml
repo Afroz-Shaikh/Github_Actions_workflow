@@ -18,7 +18,9 @@ jobs:
 
       - name: Set outputs
         id: set-outputs
-        run: echo "TOTAL=${{ steps.pana-analysis.outputs.total }} TOTAL_MAX=${{ steps.pana-analysis.outputs.total_max }}"
+        run: |
+          echo "TOTAL=${{ steps.pana-analysis.outputs.total }}"
+          echo "TOTAL_MAX=${{ steps.pana-analysis.outputs.total_max }}"
 
       - name: Checking pana scores
         env:
@@ -65,3 +67,15 @@ jobs:
 
       - name: Publish package dry run
         run: flutter pub publish --dry-run
+
+      - name: Extract version from pubspec.yaml
+        id: extract-version
+        run: |
+          VERSION=$(grep version: pubspec.yaml | awk '{print $2}' | tr -d "'")
+          echo "::set-output name=VERSION::$VERSION"
+
+      - name: Create Git tag
+        run: git tag -a v${{ steps.extract-version.outputs.VERSION }} -m "Release version ${{ steps.extract-version.outputs.VERSION }}"
+
+      - name: Push Git tag
+        run: git push origin v${{ steps.extract-version.outputs.VERSION }}
