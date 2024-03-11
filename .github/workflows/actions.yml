@@ -59,4 +59,5 @@ jobs:
           fi
 
       # Pub dry run.
+      - run: flutter doctor --v
       - run: flutter pub publish --dry-run
