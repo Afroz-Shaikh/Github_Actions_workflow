@@ -1,0 +1,36 @@
+name: Create Release Tag
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-release-tag:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && contains(github.event.head_commit.message, 'Publish package')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get latest release tag
+        id: get_latest_tag
+        run: echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
+
+      - name: Create release tag
+        id: create_tag
+        run: echo ::set-output name=RELEASE_TAG::$(echo "${GITHUB_REF/refs\/tags\//}" | sed -e 's/^v//' | awk -F'[.]' '{print "v" $1 "." $2+1 ".0"}')
+        continue-on-error: true
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.create_tag.outputs.RELEASE_TAG }}
+          release_name: Release ${{ steps.create_tag.outputs.RELEASE_TAG }}
+          body: |
+            Automatically generated release tag for version ${{ steps.create_tag.outputs.RELEASE_TAG }}.
+          draft: false
+          prerelease: false

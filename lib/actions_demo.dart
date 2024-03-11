@@ -2,6 +2,7 @@ library actions_demo;
 
 /// A Calculator.
 class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 2;
+  int addOne(int value) =>
+      value +
+      2; //asdfa sdfa asdjfh aksdfh akljsdhfklj asdhklfj ahsdkljf hakjdf asdfa sdf a
 }
