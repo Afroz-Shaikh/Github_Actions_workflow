@@ -1,3 +1,7 @@
+## 0.0.4
+
+- Playing with actions
+
 ## 0.0.2
 
 - Added bool param showLabel which controls the visibility of labels (Default is true)
