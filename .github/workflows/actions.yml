@@ -78,7 +78,9 @@ jobs:
           echo "VERSION= ${{ steps.extract-version.outputs.VERSION }}"
 
   release-on-push:
-    needs: build-and-publish
+    needs:
+      - build-and-publish
+      - create-tag
     runs-on: ubuntu-latest
     steps:
       - name: Extract version from pubspec.yaml
@@ -89,7 +91,7 @@ jobs:
 
   create-tag:
     runs-on: ubuntu-22.04
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     permissions:
       contents: write
     steps:
