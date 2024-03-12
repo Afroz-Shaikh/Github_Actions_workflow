@@ -88,5 +88,5 @@ jobs:
       - name: Create and push tag
         if: ${{ needs.build-and-publish.result == 'success' }}
         run: |
-          git tag -a ${{ needs.build-and-publish.outputs.VERSION }} -m "Release ${{ needs.build-and-publish.outputs.VERSION }}"
-          git push origin ${{ needs.build-and-publish.outputs.VERSION }}
+          git tag -a "$VERSION" -m "Release $VERSION"
+          git push origin "$VERSION"
