@@ -78,8 +78,10 @@ jobs:
     needs: build-and-publish
     runs-on: ubuntu-latest
     steps:
-      - name: Release on Push
-        uses: rymndhng/release-on-push-action@master
-        with:
-          tag_prefix: ""
-          bump_version_scheme: "patch" # or any other bump version scheme you want to use
+      - name: Get latest release tag
+        id: get_latest_tag
+        run: echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
+
+      - name: Create release tag
+        id: create_tag
+        run: echo ::set-output name=RELEASE_TAG::$(echo "${TAG}" | awk -F'[.]' '{print "v" $1 "." $2+1 ".0"}')
