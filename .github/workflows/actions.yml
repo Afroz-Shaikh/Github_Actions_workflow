@@ -32,7 +32,6 @@ jobs:
             echo "Score too low!"
             exit 1
           fi
-
           echo "Score is satisfactory. Proceeding to build."
 
   build-and-publish:
@@ -42,11 +41,37 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        # Specify the path where the repository should be checked out
-        with:
-          path: my-repo
 
-      # Rest of your steps...
+      - name: Setup Java environment
+        uses: actions/setup-java@v1
+        with:
+          java-version: "12.x"
+
+      - name: Setup Flutter environment
+        uses: subosito/flutter-action@v1
+        with:
+          channel: "stable"
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Check for formatting issues
+        run: dart format --set-exit-if-changed .
+
+      - name: Statically analyze Dart code
+        run: flutter analyze .
+
+      - name: Run widget tests
+        run: flutter test
+
+      - name: Publish package dry run
+        run: flutter pub publish --dry-run
+
+      - name: Extract version from pubspec.yaml
+        id: extract-version
+        run: |
+          VERSION=$(grep version: pubspec.yaml | awk '{print $2}' | tr -d "'")
+          echo "::set-output name=VERSION::$VERSION"
 
   release-on-push:
     needs: build-and-publish
@@ -54,17 +79,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-        # Specify the path where the repository should be checked out
-        with:
-          path: my-repo
 
       - name: Get latest release tag
         id: get_latest_tag
-        run: echo ::set-output name=TAG::$(git -C my-repo describe --abbrev=0 --tags)
+        run: echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
 
       - name: Create release tag
         id: create_tag
         run: |
-          TAG=$(echo "${TAG}" | awk -F'[.]' '{print "v" $1 "." $2+1 ".0"}')
-          git -C my-repo tag $TAG
-          git -C my-repo push origin $TAG
+          TAG=${{ steps.extract-version.outputs.VERSION }}
+          git tag $TAG
+          git push origin $TAG
