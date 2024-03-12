@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Pana analyzer
         uses: axel-op/dart-package-analyzer@v3
@@ -40,17 +40,14 @@ jobs:
     if: ${{ needs.analyze-package.result == 'success' }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup Java environment
-        uses: actions/setup-java@v1
-        with:
-          java-version: "12.x"
+        uses: actions/checkout@v4
 
       - name: Setup Flutter environment
-        uses: subosito/flutter-action@v1
+        uses: subosito/flutter-action@v2
         with:
           channel: "stable"
+      - name: Flutter version Check
+        run: flutter --version
 
       - name: Get Flutter dependencies
         run: flutter pub get
@@ -82,24 +79,17 @@ jobs:
     needs: build-and-publish
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Get latest release tag
-        id: get_latest_tag
-        run: echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
-
-      - name: Check for empty VERSION
+      - name: Extract version from pubspec.yaml
+        id: extract-version
         run: |
-          if [[ -z "$VERSION" ]]; then
-            echo "Error: VERSION variable is empty. Skipping tag creation."
-            exit 1
-          fi
+          VERSION=$(grep version: pubspec.yaml | awk '{print $2}' | tr -d "'")
+          echo "Extracted version: $VERSION"
 
-      - name: Create and push tag (if VERSION is set)
-        if: ${{ needs.build-and-publish.result == 'success' }}
-        env:
-          VERSION: ${{ steps.extract-version.outputs.VERSION }}
+      - name: Set up Git user
+        uses: fregante/setup-git-user@v2
+
+      - name: Create and push tag
+        if: ${{ needs.analyze-package.result == 'success' }}
         run: |
-          git tag -a "$VERSION" -m "Release $VERSION"
-          git push origin "$VERSION"
+          git tag -a "v${{ steps.extract-version.outputs.VERSION }}" -m "Release v${{ steps.extract-version.outputs.VERSION }}"
+          git push origin "v${{ steps.extract-version.outputs.VERSION }}"
