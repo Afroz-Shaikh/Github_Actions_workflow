@@ -1,35 +1,25 @@
-name: Create Release Tag
+name: Create Tag
 
 on:
   push:
     branches:
-      - main
-
+      - dev
 jobs:
-  create-release-tag:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && contains(github.event.head_commit.message, 'Publish package')
-
+  reate-tag:
+    runs-on: ubuntu-22.04
+    # if: github.event.pull_request.merged == true
+    permissions:
+      contents: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Get latest release tag
-        id: get_latest_tag
-        run: echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
-
-      - name: Create release tag
-        id: create_tag
-        run: echo ::set-output name=RELEASE_TAG::$(echo "${TAG}" | awk -F'[.]' '{print "v" $1 "." $2+1 ".0"}')
-
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }} # Use your personal access token secret here
+      - uses: actions/checkout@v3
         with:
-          tag_name: ${{ steps.create_tag.outputs.RELEASE_TAG }}
-          release_name: Release ${{ steps.create_tag.outputs.RELEASE_TAG }}
-          body: |
-            Automatically generated release tag for version ${{ steps.create_tag.outputs.RELEASE_TAG }}.
-          draft: false
-          prerelease: false
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: "0"
+
+      - name: Bump version and push tag
+        uses: anothrNick/github-tag-action@1.64.0 # Don't use @master or @v1 unless you're happy to test the latest version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
+          WITH_V: true
+          PRERELEASE: false
+          TAG_PREFIX: "Glue"
