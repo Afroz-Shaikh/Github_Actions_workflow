@@ -72,7 +72,7 @@ jobs:
         run: |
           VERSION=$(grep version: pubspec.yaml | awk '{print $2}' | tr -d "'")
           echo "Extracted version: $VERSION"
-          echo "::set-output name=VERSION::$VERSION"
+          echo "VERSION= ${{ steps.extract-version.outputs.VERSION }}"
 
   release-on-push:
     needs: build-and-publish
@@ -87,6 +87,8 @@ jobs:
 
       - name: Create and push tag
         if: ${{ needs.build-and-publish.result == 'success' }}
+        env:
+          VERSION: ${{ steps.extract-version.outputs.VERSION }}
         run: |
           git tag -a "$VERSION" -m "Release $VERSION"
           git push origin "$VERSION"
