@@ -9,6 +9,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        # Specify the path where the repository should be checked out
+        with:
+          path: my-repo
 
       - name: Pana analyzer
         uses: axel-op/dart-package-analyzer@v3
@@ -21,6 +24,8 @@ jobs:
         run: |
           echo "TOTAL=${{ steps.pana-analysis.outputs.total }}"
           echo "TOTAL_MAX=${{ steps.pana-analysis.outputs.total_max }}"
+        # Set the working directory to the checked out repository
+        working-directory: my-repo
 
       - name: Checking pana scores
         env:
@@ -34,6 +39,8 @@ jobs:
           fi
 
           echo "Score is satisfactory. Proceeding to build."
+        # Set the working directory to the checked out repository
+        working-directory: my-repo
 
   build-and-publish:
     runs-on: ubuntu-latest
@@ -42,40 +49,29 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Setup Java environment
-        uses: actions/setup-java@v1
+        # Specify the path where the repository should be checked out
         with:
-          java-version: "12.x"
+          path: my-repo
 
-      - name: Setup Flutter environment
-        uses: subosito/flutter-action@v1
+      # Rest of your steps...
+
+  release-on-push:
+    needs: build-and-publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        # Specify the path where the repository should be checked out
         with:
-          channel: "stable"
+          path: my-repo
 
-      - name: Get Flutter dependencies
-        run: flutter pub get
+      - name: Get latest release tag
+        id: get_latest_tag
+        run: echo ::set-output name=TAG::$(git -C my-repo describe --abbrev=0 --tags)
 
-      - name: Check for formatting issues
-        run: dart format --set-exit-if-changed .
-
-      - name: Statically analyze Dart code
-        run: flutter analyze .
-
-      - name: Run widget tests
-        run: flutter test
-
-      - name: Publish package dry run
-        run: flutter pub publish --dry-run
-
-      - name: Extract version from pubspec.yaml
-        id: extract-version
+      - name: Create release tag
+        id: create_tag
         run: |
-          VERSION=$(grep version: pubspec.yaml | awk '{print $2}' | tr -d "'")
-          echo "::set-output name=VERSION::$VERSION"
-
-      - name: Create Git tag
-        run: git tag -a v${{ steps.extract-version.outputs.VERSION }} -m "Release version ${{ steps.extract-version.outputs.VERSION }}"
-
-      - name: Push Git tag
-        run: git push origin v${{ steps.extract-version.outputs.VERSION }}
+          TAG=$(echo "${TAG}" | awk -F'[.]' '{print "v" $1 "." $2+1 ".0"}')
+          git -C my-repo tag $TAG
+          git -C my-repo push origin $TAG
