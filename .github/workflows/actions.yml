@@ -82,4 +82,4 @@ jobs:
         uses: rymndhng/release-on-push-action@master
         with:
           tag_prefix: ""
-          bump_version_scheme: "semver" # or any other bump version scheme you want to use
+          bump_version_scheme: "patch" # or any other bump version scheme you want to use
