@@ -73,10 +73,17 @@ jobs:
           VERSION=$(grep version: pubspec.yaml | awk '{print $2}' | tr -d "'")
           echo "Extracted version: $VERSION"
           git tag -a $VERSION -m "Release $VERSION"
-          git push origin $VERSION
+
+      - name: Set up Git user
+        uses: fregante/setup-git-user@v2
+
+      - name: Commit changes
+        run: git commit --message 'Bump version to $VERSION'
+
+      - name: Push changes
+        run: git push origin $VERSION
 
         #   echo "::set-output name=VERSION::$VERSION"
-
 #   release-on-push:
 #     needs: build-and-publish
 #     runs-on: ubuntu-latest
