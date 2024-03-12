@@ -71,6 +71,10 @@ jobs:
         id: extract-version
         run: |
           VERSION=$(grep version: pubspec.yaml | awk '{print $2}' | tr -d "'")
+          if [[ -z "$VERSION" ]]; then
+            echo "Error: VERSION variable is empty. Skipping tag creation."
+            exit 1
+          fi
           echo "Extracted version: $VERSION"
           echo "VERSION= ${{ steps.extract-version.outputs.VERSION }}"
 
@@ -85,7 +89,14 @@ jobs:
         id: get_latest_tag
         run: echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
 
-      - name: Create and push tag
+      - name: Check for empty VERSION
+        run: |
+          if [[ -z "$VERSION" ]]; then
+            echo "Error: VERSION variable is empty. Skipping tag creation."
+            exit 1
+          fi
+
+      - name: Create and push tag (if VERSION is set)
         if: ${{ needs.build-and-publish.result == 'success' }}
         env:
           VERSION: ${{ steps.extract-version.outputs.VERSION }}
