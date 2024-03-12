@@ -84,4 +84,7 @@ jobs:
 
       - name: Create release tag
         id: create_tag
-        run: echo ::set-output name=RELEASE_TAG::$(echo "${TAG}" | awk -F'[.]' '{print "v" $1 "." $2+1 ".0"}')
+        run: |
+          TAG=$(echo "${TAG}" | awk -F'[.]' '{print "v" $1 "." $2+1 ".0"}')
+          git tag $TAG
+          git push origin $TAG
