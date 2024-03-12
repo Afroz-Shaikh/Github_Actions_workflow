@@ -81,4 +81,5 @@ jobs:
       - name: Release on Push
         uses: rymndhng/release-on-push-action@master
         with:
-          tag_name: ${{ steps.extract-version.outputs.VERSION }}
+          tag_prefix: ""
+          bump_version_scheme: "semver" # or any other bump version scheme you want to use
