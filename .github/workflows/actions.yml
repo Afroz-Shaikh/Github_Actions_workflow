@@ -72,23 +72,26 @@ jobs:
         run: |
           VERSION=$(grep version: pubspec.yaml | awk '{print $2}' | tr -d "'")
           echo "Extracted version: $VERSION"
-          echo "::set-output name=VERSION::$VERSION"
+          git tag -a $VERSION -m "Release $VERSION"
+          git push origin $VERSION
 
-  release-on-push:
-    needs: build-and-publish
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+        #   echo "::set-output name=VERSION::$VERSION"
 
-      - name: Get latest release tag
-        id: get_latest_tag
-        run: echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
+#   release-on-push:
+#     needs: build-and-publish
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
 
-      - name: Create release tag
-        id: create_tag
-        run: |
-          TAG=${{ steps.extract-version.outputs.VERSION }}
-          echo "Creating release tag: $TAG"
-          git tag $TAG
-          git push origin $TAG
+#       - name: Get latest release tag
+#         id: get_latest_tag
+#         run: echo ::set-output name=TAG::$(git describe --abbrev=0 --tags)
+
+#       - name: Create release tag
+#         id: create_tag
+#         run: |
+#           TAG=${{ steps.extract-version.outputs.VERSION }}
+#           echo "Creating release tag: $TAG"
+#           git tag $TAG
+#           git push origin $TAG
