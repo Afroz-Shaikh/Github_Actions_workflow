@@ -1,7 +1,9 @@
 name: Trigger PubDev Release
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - dev
 
 jobs:
   analyze-package:
