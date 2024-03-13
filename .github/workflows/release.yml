@@ -1,9 +1,8 @@
 name: Create Tag
 
 on:
-  push:
-    branches:
-      - dev
+  workflow_dispatch:
+
 jobs:
   reate-tag:
     runs-on: ubuntu-22.04
@@ -22,4 +21,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
           WITH_V: true
           PRERELEASE: false
-          TAG_PREFIX: "Glue"
