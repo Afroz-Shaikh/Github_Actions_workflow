@@ -2,6 +2,7 @@ library actions_demo;
 
 /// A Calculator.
 class Calculator {
+  String name = 'afroz';
   //a ldkfjalsdkfja
   int addOne(int value) =>
       value +
